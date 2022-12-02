@@ -1,3 +1,4 @@
+#![feature(array_chunks)]
 extern crate aoc_runner;
 
 #[macro_use]
