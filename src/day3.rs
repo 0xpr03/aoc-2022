@@ -57,50 +57,32 @@ pub fn part1(input: &[u8]) -> i64 {
 #[aoc(day3, part2, Chars)]
 pub fn part2(input: &[u8]) -> i64 {
     let mut sum: i64 = 0;
-    let mut start = 0;
     let mut counter = [0u8;58];
     let mut elf = 0;
-    for (i,c) in input.iter().enumerate() {
-        if *c == b'\n' {
-            for c in &input[start..i] {
-                // assert_ne!(*c,b'\n');
-                // counter[(*c-b'A') as usize] = 1;
-                let v = unsafe {counter.get_unchecked_mut((c-b'A') as usize)};
-                match elf {
-                    0 => (*v) = 1,
-                    1 => {
-                        if (*v) == 1 {
-                            *v = 2;
-                        }
-                    },
-                    _ => if *v == 2 {
-                        // println!("start {start} i {i} Found {}",*c);
-                        sum += value(*c) as i64;
-                        break;
+    for line in input.split(|v| *v == b'\n') {
+        for c in line {
+            // assert_ne!(*c,b'\n');
+            // counter[(*c-b'A') as usize] = 1;
+            let v = unsafe {counter.get_unchecked_mut((c-b'A') as usize)};
+            match elf {
+                0 => (*v) = 1,
+                1 => {
+                    if (*v) == 1 {
+                        *v = 2;
                     }
+                },
+                _ => if *v == 2 {
+                    // println!("start {start} i {i} Found {}",*c);
+                    sum += value(*c) as i64;
+                    break;
                 }
             }
-            if elf < 2 {
-                elf += 1;
-            } else {
-                counter.iter_mut().for_each(|m| *m = 0);
-                elf = 0;
-            }
-            start = i + 1;
         }
-    }
-    let i = input.len();
-    for c in &input[start..i] {
-        // assert_ne!(*c,b'\n');
-        // counter[(*c-b'A') as usize] = 1;
-        let v = unsafe {counter.get_unchecked_mut((c-b'A') as usize)};
-        match elf {
-            3 => if *v == 2 {
-                // println!("start {start} i {i} Found {}",*c);
-                sum += value(*c) as i64;
-                break;
-            },
-            _ => (),
+        if elf < 2 {
+            elf += 1;
+        } else {
+            counter.iter_mut().for_each(|m| *m = 0);
+            elf = 0;
         }
     }
     sum
