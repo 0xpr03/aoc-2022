@@ -50,7 +50,6 @@ dependencies = [
  "atoi_radix10",
  "bitvec",
  "bytemuck",
- "core_simd",
  "itertools",
  "memchr",
  "parse-display",
@@ -100,11 +99,6 @@ name = "cfg-if"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
-
-[[package]]
-name = "core_simd"
-version = "0.1.0"
-source = "git+https://github.com/rust-lang/portable-simd#1547dd66f9c3c2ba9e4998f8d4885e4f7bd62c52"
 
 [[package]]
 name = "crossbeam-channel"

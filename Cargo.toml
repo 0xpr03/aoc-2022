@@ -18,7 +18,7 @@ rayon = "1"
 regex = "1"
 parse-display = "0.6"
 memchr = "2"
-core_simd = { git = "https://github.com/rust-lang/portable-simd" }
+#core_simd = { git = "https://github.com/rust-lang/portable-simd" }
 arrayvec = "0.7"
 rustc-hash = "1"
 bitvec = "1"
