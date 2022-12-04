@@ -35,8 +35,7 @@ pub fn part2(input: &[u8]) -> i64 {
     input.split(|x|*x == b'\n')
     .filter(|s| !s.is_empty())
     .map(|x|(x,x.iter().position(|x|*x == b',').unwrap()))
-    .map(|(x,pos)|x.split_at(pos))
-    .map(|(a,b)|(a,&b[1..]))
+    .map(|(x,pos)|(&x[..pos],&x[pos+1..]))
     // .map(|v|{
     //     let (a,b) = v;
     //     println!("a {} b {}",
@@ -46,8 +45,7 @@ pub fn part2(input: &[u8]) -> i64 {
     // })
     .map(|(a,b)|(a,a.iter().position(|x|*x == b'-').unwrap(),
     b,b.iter().position(|x|*x == b'-').unwrap()))
-    .map(|(a,posa,b,posb)|(a.split_at(posa),b.split_at(posb)))
-    .map(|(a,b)|(a.0,&a.1[1..],b.0,&b.1[1..]))
+    .map(|(a,posa,b,posb)|(&a[..posa],&a[posa+1..],&b[..posb],&b[posb+1..]))
     // .map(|v|{
     //     let (a0,a1,b0,b1) = v;
     //     println!("a1 {} a2 {} b1 {} b2 {}",
