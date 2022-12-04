@@ -32,12 +32,10 @@ pub fn part2(input: &[u8]) -> i64 {
 
 #[inline(always)]
 fn overlaps(a1: u16,a2: u16,b1: u16,b2: u16) -> i64 {
-    if a1 <= b1 && a2 >= b1 {
-        1
-    } else if b1 <= a2 && b2 >= a1 {
-        1
-    } else {
+    if a2 < b1 || b2 < a1 {
         0
+    } else {
+        1
     }
 }
 
