@@ -4,13 +4,18 @@ use bytemuck::cast_slice;
 pub fn part1(input: &[u8]) -> i64 {
     input.split(|x|*x == b'\n')
     .filter(|s| !s.is_empty())
+    // split ,
     .map(|x|(x,x.iter().position(|x|*x == b',').unwrap()))
     .map(|(x,pos)|(&x[..pos],&x[pos+1..]))
+    // split a and b by -
     .map(|(a,b)|(a,a.iter().position(|x|*x == b'-').unwrap(),
     b,b.iter().position(|x|*x == b'-').unwrap()))
     .map(|(a,posa,b,posb)|(&a[..posa],&a[posa+1..],&b[..posb],&b[posb+1..]))
+    // reinterpret bytes to u16, we don't need the actual int values for our comparison
+    // as long as we get the endianess right
     .map(|(a0,a1,b0,b1)|(stou16(a0),stou16(a1),stou16(b0),stou16(b1)))
-    .map(|v|contains(v.0,v.1,v.2,v.3)).sum()
+    .map(|v|contains(v.0,v.1,v.2,v.3))
+    .sum()
 }
 
 #[aoc(day4, part2, Chars)]
@@ -52,7 +57,7 @@ fn contains(a1: u16,a2: u16,b1: u16,b2: u16) -> i64 {
 fn stou16(bytes: &[u8]) -> u16 {
     if bytes.len() > 1 {
         let n: [u8;2] = bytes[0..2].try_into().unwrap();
-        u16::from_be_bytes(n)
+        u16::from_be_bytes(n) // relevant for our comparison to use be !
     } else {
         bytes[0] as u16
     }
