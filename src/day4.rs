@@ -1,5 +1,3 @@
-use bytemuck::cast_slice;
-
 #[aoc(day4, part1, Chars)]
 pub fn part1(input: &[u8]) -> i64 {
     input.split(|x|*x == b'\n')
@@ -14,6 +12,7 @@ pub fn part1(input: &[u8]) -> i64 {
     // reinterpret bytes to u16, we don't need the actual int values for our comparison
     // as long as we get the endianess right
     .map(|(a0,a1,b0,b1)|(stou16(a0),stou16(a1),stou16(b0),stou16(b1)))
+    // using .filter().count() is actually slower than this
     .map(|v|contains(v.0,v.1,v.2,v.3))
     .sum()
 }
