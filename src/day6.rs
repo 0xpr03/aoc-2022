@@ -18,15 +18,13 @@ pub fn part1(input: &[u8]) -> usize {
     }
     test_initial!(input,2,skip);
     test_initial!(input,3,skip);
-    test_initial!(input,4,skip);
     
-    for (index,part) in input.array_windows::<5>().enumerate(){
+    for (index,part) in input.array_windows::<4>().enumerate(){
         // dbg!(skip);
         // dbg!(index);
-        for (i,v) in part[0..4].iter().enumerate().rev() {
+        for (i,v) in part[0..3].iter().enumerate().rev() {
             let skip_n = index + i;
-            if *v == part[4] {
-                
+            if *v == part[3] {
                 if skip_n > skip {
                     skip = index+i;
                 }
