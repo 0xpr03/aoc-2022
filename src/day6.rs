@@ -24,11 +24,14 @@ pub fn part1(input: &[u8]) -> usize {
         // dbg!(skip);
         // dbg!(index);
         for (i,v) in part[0..4].iter().enumerate().rev() {
+            let skip_n = index + i;
             if *v == part[4] {
-                let skip_n = index + i;
+                
                 if skip_n > skip {
                     skip = index+i;
                 }
+                break;
+            } else if skip_n < skip {
                 break;
             }
         }
@@ -62,11 +65,13 @@ pub fn part2(input: &[u8]) -> usize {
         // dbg!(skip);
         // dbg!(index);
         for (i,v) in part[0..13].iter().enumerate().rev() {
+            let skip_n = index + i;
             if *v == part[13] {
-                let skip_n = index + i;
                 if skip_n > skip {
                     skip = index+i;
                 }
+                break;
+            } else if skip_n < skip {
                 break;
             }
         }
