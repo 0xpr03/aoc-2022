@@ -1,8 +1,5 @@
-use std::{collections::HashMap, io::Write};
-
-const ENTRIES: usize = 10;
-const FILENAME: usize = 20;
-
+const ENTRIES: usize = 11;
+const DIRS: usize = 200;
 #[aoc(day7, part1, Schokis)]
 pub fn part1(input: &[u8]) -> usize {
     let mut sizes = Stack::new();
@@ -54,31 +51,92 @@ pub fn part1(input: &[u8]) -> usize {
         let v = sizes.sum_up();
         if v < LIMIT {
             sum += v;
+        } else {
+            break;
         }
     }
     sum
 }
 
+#[aoc(day7, part2, Schokis)]
+pub fn part2(input: &[u8]) -> usize {
+    const TOTAL: usize = 70000000;
+    const REQUIRED: usize = 30000000;
+    let mut sizes = Stack::new();
+    let mut dirs = Dirs::new();
+    for line in input.split(|x|*x == b'\n') {
+        if line.len() == 0 {
+            break;
+        }
+        // print!("{} ",std::str::from_utf8(line).unwrap());
+        match (line[0],line[2]) {
+            // $ cd /
+            (b'$',b'c') => {
+                if line[5] == b'.' {
+                    // dbg!(&sizes);
+                    let v = sizes.sum_up();
+                    dirs.push(v);
+                    // dbg!(&sizes);
+                } else {
+                    sizes.push(0);
+                    // dbg!(&sizes);
+                }
+            },
+            // $ ls
+            (b'$',b'l') => {
+                // println!();
+                continue;
+            },
+            // dir
+            (b'd',_) => {
+                // println!();
+                continue;
+            },
+            // 282147 mjtq.ffd
+            (_,_) => {
+                let mut foo = line.split(|x|*x == b' ');
+                let number = foo.next().unwrap();
+                let n = atoi(number);
+                // println!("n: {n}");
+                sizes.add(n as _);
+            }
+        }
+    }
+    while sizes.len > 1 {
+        let v = sizes.sum_up();
+        dirs.push(v);
+    }
+    let sum = sizes.data[0];
+    let needed = REQUIRED - (TOTAL - sum);
+    let mut dir = REQUIRED;
+    for d in dirs.data[0..dirs.len].iter() {
+        if *d > needed && *d < dir {
+            dir = *d;
+        }
+    }
+    dir
+}
+
 #[inline(always)]
 fn atoi(bytes: &[u8]) -> u32 {
     match bytes.len() {
-        8 => (bytes[0] as u32) * 10000000 +
-            (bytes[1] as u32) * 1000000 +
-            (bytes[2] as u32) * 100000 +
-            (bytes[3] as u32) * 10000 +
-            (bytes[4] as u32) * 1000 +
-            (bytes[5] as u32) * 100 +
-            (bytes[6] as u32) * 10 +
-            (bytes[7] as u32) -
-            533333328,
-        7 => (bytes[0] as u32) * 1000000 +
-            (bytes[1] as u32) * 100000 +
-            (bytes[2] as u32) * 10000 +
-            (bytes[3] as u32) * 1000 +
-            (bytes[4] as u32) * 100 +
-            (bytes[5] as u32) * 10 +
-            (bytes[6] as u32) -
-            53333328,
+        // 8 => (bytes[0] as u32) * 10000000 +
+        //     (bytes[1] as u32) * 1000000 +
+        //     (bytes[2] as u32) * 100000 +
+        //     (bytes[3] as u32) * 10000 +
+        //     (bytes[4] as u32) * 1000 +
+        //     (bytes[5] as u32) * 100 +
+        //     (bytes[6] as u32) * 10 +
+        //     (bytes[7] as u32) -
+        //     533333328,
+        // 7 => (bytes[0] as u32) * 1000000 +
+        //     (bytes[1] as u32) * 100000 +
+        //     (bytes[2] as u32) * 10000 +
+        //     (bytes[3] as u32) * 1000 +
+        //     (bytes[4] as u32) * 100 +
+        //     (bytes[5] as u32) * 10 +
+        //     (bytes[6] as u32) -
+        //     53333328,
         6 => (bytes[0] as u32) * 100000 +
             (bytes[1] as u32) * 10000 +
             (bytes[2] as u32) * 1000 +
@@ -100,8 +158,8 @@ fn atoi(bytes: &[u8]) -> u32 {
         3 => (bytes[0] as u32) * 100 +
             (bytes[1] as u32) * 10 +
             (bytes[2] as u32) -
-            5328, // testing only
-        v => unreachable!("{}",v),
+            5328,
+        _ => 0,
     }
 }
 
@@ -125,6 +183,26 @@ fn atoi(bytes: &[u8]) -> u32 {
 //     }
 // }
 
+struct Dirs {
+    len: usize,
+    data: [usize; DIRS]
+}
+
+impl Dirs {
+    const fn new() -> Self {
+        Self {
+            len: 0,
+            data: [0; DIRS]
+        }
+    }
+    #[inline(always)]
+    fn push(&mut self, data: usize) {
+        // assert!(self.len < ENTRIES, "pushed Stack out of boundary");
+        self.data[self.len] = data;
+        self.len += 1;
+    }
+}
+
 #[derive(Debug)]
 struct Stack{
     len: usize,
@@ -140,24 +218,24 @@ impl Stack {
     }
     #[inline(always)]
     fn push(&mut self, data: usize) {
-        assert!(self.len < ENTRIES, "pushed Stack out of boundary");
+        // assert!(self.len < ENTRIES, "pushed Stack out of boundary");
         self.data[self.len] = data;
         self.len += 1;
     }
     #[inline(always)]
     pub fn add(&mut self, data: usize) {
-        assert!(self.len > 0, "add out of bounds");
+        // assert!(self.len > 0, "add out of bounds");
         self.data[self.len-1] += data;
     }
     #[inline(always)]
     fn pop(&mut self) -> usize {
-        assert!(self.len > 0, "popped Stack out of boundary");
+        // assert!(self.len > 0, "popped Stack out of boundary");
         self.len -= 1;
         self.data[self.len]
     }
     #[inline(always)]
     fn sum_up(&mut self) -> usize {
-        assert!(self.len > 1, "popped Stack out of boundary");
+        // assert!(self.len > 1, "popped Stack out of boundary");
         self.len -= 1;
         let v = self.data[self.len];
         self.data[self.len-1] += v;
@@ -165,7 +243,7 @@ impl Stack {
     }
     #[inline(always)]
     fn top<'a>(&'a self) -> usize {
-        assert!(self.len > 0, "top on empty Stack");
+        // assert!(self.len > 0, "top on empty Stack");
         self.data[self.len - 1]
     }
     fn get(&self, i: usize) -> Option<usize> {
