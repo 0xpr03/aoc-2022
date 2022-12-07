@@ -39,9 +39,16 @@ pub fn part1(input: &[u8]) -> usize {
             },
             // 282147 mjtq.ffd
             (_,_) => {
-                let mut foo = line.split(|x|*x == b' ');
-                let number = foo.next().unwrap();
-                let n = atoi(number);
+                let pos = if line[6] == b' ' {
+                    6
+                } else if line[5] == b' ' {
+                    5
+                } else if line[4] == b' ' {
+                    4
+                } else {
+                    3
+                };
+                let n = atoi(&unsafe {line.get_unchecked(..pos)});
                 // println!("n: {n}");
                 sizes.add(n as _);
             }
@@ -60,7 +67,7 @@ pub fn part1(input: &[u8]) -> usize {
 
 #[aoc(day7, part2, Schokis)]
 pub fn part2(input: &[u8]) -> usize {
-    const TOTAL: usize = 70000000;
+    const TOTAL: usize = 70_000_000;
     const REQUIRED: usize = 30000000;
     let mut sizes = Stack::new();
     let mut dirs = Dirs::new();
@@ -94,9 +101,21 @@ pub fn part2(input: &[u8]) -> usize {
             },
             // 282147 mjtq.ffd
             (_,_) => {
-                let mut foo = line.split(|x|*x == b' ');
-                let number = foo.next().unwrap();
-                let n = atoi(number);
+                
+                // let pos = line.iter().position(|v|*v == b' ').unwrap_or(0);
+                let pos = if line[6] == b' ' {
+                    6
+                } else if line[5] == b' ' {
+                    5
+                } else if line[4] == b' ' {
+                    4
+                } else {
+                    3
+                };
+                let n = atoi(&unsafe {line.get_unchecked(..pos)});
+                // let mut foo = line.split(|x|*x == b' ');
+                // let number = foo.next().unwrap();
+                // let n = atoi(number);
                 // println!("n: {n}");
                 sizes.add(n as _);
             }
@@ -106,10 +125,10 @@ pub fn part2(input: &[u8]) -> usize {
         let v = sizes.sum_up();
         dirs.push(v);
     }
-    let sum = sizes.data[0];
+    let sum = unsafe {sizes.data.get_unchecked(0)};
     let needed = REQUIRED - (TOTAL - sum);
     let mut dir = REQUIRED;
-    for d in dirs.data[0..dirs.len].iter() {
+    for d in unsafe {dirs.data.get_unchecked_mut(0..dirs.len)}.iter() {
         if *d > needed && *d < dir {
             dir = *d;
         }
@@ -198,7 +217,7 @@ impl Dirs {
     #[inline(always)]
     fn push(&mut self, data: usize) {
         // assert!(self.len < ENTRIES, "pushed Stack out of boundary");
-        self.data[self.len] = data;
+        unsafe {*self.data.get_unchecked_mut(self.len) = data;}
         self.len += 1;
     }
 }
@@ -219,37 +238,22 @@ impl Stack {
     #[inline(always)]
     fn push(&mut self, data: usize) {
         // assert!(self.len < ENTRIES, "pushed Stack out of boundary");
-        self.data[self.len] = data;
+        unsafe{*self.data.get_unchecked_mut(self.len) = data;}
         self.len += 1;
     }
     #[inline(always)]
     pub fn add(&mut self, data: usize) {
         // assert!(self.len > 0, "add out of bounds");
-        self.data[self.len-1] += data;
-    }
-    #[inline(always)]
-    fn pop(&mut self) -> usize {
-        // assert!(self.len > 0, "popped Stack out of boundary");
-        self.len -= 1;
-        self.data[self.len]
+        unsafe {*self.data.get_unchecked_mut(self.len-1) += data;}
     }
     #[inline(always)]
     fn sum_up(&mut self) -> usize {
         // assert!(self.len > 1, "popped Stack out of boundary");
         self.len -= 1;
-        let v = self.data[self.len];
-        self.data[self.len-1] += v;
-        v
-    }
-    #[inline(always)]
-    fn top<'a>(&'a self) -> usize {
-        // assert!(self.len > 0, "top on empty Stack");
-        self.data[self.len - 1]
-    }
-    fn get(&self, i: usize) -> Option<usize> {
-        match i < self.len {
-            true => Some(self.data[i]),
-            false => None,
+        unsafe {
+            let v = *self.data.get_unchecked(self.len);
+            *self.data.get_unchecked_mut(self.len-1) += v;
+            return v;
         }
     }
 }
