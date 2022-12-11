@@ -18,7 +18,7 @@ pub fn part1(input: &[u8]) -> usize {
     let mut head = (0,0);
     // x,y
     let mut tail = (0,0);
-    let mut knownPos: HashSet<(i32,i32)> = HashSet::new();
+    let mut knownPos: HashSet<(i32,i32)> = HashSet::with_capacity(3000);
 
     for v in input.split(|x|*x == b'\n') {
         if v.is_empty() {
@@ -74,7 +74,7 @@ pub fn part1(input: &[u8]) -> usize {
 pub fn part2(input: &[u8]) -> usize {
     // x,y, 0 = head, 9 = tail
     let mut snake = [(0,0);10];
-    let mut known_pos: HashSet<(i32,i32)> = HashSet::new();
+    let mut known_pos: HashSet<(i32,i32)> = HashSet::with_capacity(3000);
 
     for v in input.split(|x|*x == b'\n') {
         if v.is_empty() {
