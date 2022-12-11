@@ -18,7 +18,7 @@ pub fn part1(input: &[u8]) -> usize {
     let mut head = (0,0);
     // x,y
     let mut tail = (0,0);
-    let mut knownPos: HashSet<(i32,i32)> = HashSet::with_capacity(3000);
+    let mut knownPos: HashSet<(i32,i32)> = HashSet::with_capacity(7000);
 
     for v in input.split(|x|*x == b'\n') {
         if v.is_empty() {
