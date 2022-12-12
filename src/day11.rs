@@ -136,6 +136,7 @@ pub fn part2(input: &[u8]) -> usize {
                 };
                 // modulo shenanigans, so we don't overflow
                 // has to be a multiple of all divisors used
+                // full "proof" https://github.com/jake-gordon/aoc/blob/be738517deb8b4a9831808946961508ac52c9737/2022/D11/Explanation.md
                 let item = item % denominator;
                 let new_monkey = match item % (*monkey).divisor == 0 {
                     true => (*monkey).true_monkey,
