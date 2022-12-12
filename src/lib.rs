@@ -1,6 +1,7 @@
 #![feature(array_chunks)]
 #![feature(iter_array_chunks)]
 #![feature(array_windows)]
+#![feature(byte_slice_trim_ascii)]
 extern crate aoc_runner;
 
 #[macro_use]
@@ -16,5 +17,6 @@ pub mod day7;
 pub mod day8;
 pub mod day9;
 pub mod day10;
+pub mod day11;
 
 aoc_lib!{ year = 2022 }
