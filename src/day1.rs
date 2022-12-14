@@ -17,7 +17,7 @@ pub fn part1(input: &[u8]) -> i64 {
                 last_sum += atoi(v);
                 newline = true;
             }
-        } else if newline{
+        } else if newline {
             start = index;
             newline = false;
         }
@@ -31,18 +31,18 @@ pub fn part1(input: &[u8]) -> i64 {
 #[inline(always)]
 fn atoi(bytes: &[u8]) -> u32 {
     if bytes.len() == 5 {
-        (bytes[0] as u32) * 10000 +
-        (bytes[1] as u32) * 1000 +
-        (bytes[2] as u32) * 100 +
-        (bytes[3] as u32) * 10 +
-        (bytes[4] as u32) -
-        533328
+        (bytes[0] as u32) * 10000
+            + (bytes[1] as u32) * 1000
+            + (bytes[2] as u32) * 100
+            + (bytes[3] as u32) * 10
+            + (bytes[4] as u32)
+            - 533328
     } else {
-        (bytes[0] as u32) * 1000 +
-        (bytes[1] as u32) * 100 +
-        (bytes[2] as u32) * 10 +
-        (bytes[3] as u32) -
-        53328
+        (bytes[0] as u32) * 1000
+            + (bytes[1] as u32) * 100
+            + (bytes[2] as u32) * 10
+            + (bytes[3] as u32)
+            - 53328
     }
 }
 
@@ -55,13 +55,18 @@ fn atoi_old(bytes: &[u8]) -> i64 {
 }
 
 pub fn part1origin(input: &str) -> i64 {
-    input.trim().split("\n\n")
-        .map(|group|group.split("\n")
-            .map(|v|atoi_radix10::parse::<i64>(v.as_bytes()).unwrap())
-            .fold(0, |acc,x|acc+x))
-        .max().unwrap()
+    input
+        .trim()
+        .split("\n\n")
+        .map(|group| {
+            group
+                .split("\n")
+                .map(|v| atoi_radix10::parse::<i64>(v.as_bytes()).unwrap())
+                .fold(0, |acc, x| acc + x)
+        })
+        .max()
+        .unwrap()
 }
-
 
 #[aoc(day1, part2, Chars)]
 pub fn part2(input: &str) -> i64 {
@@ -95,7 +100,7 @@ pub fn part2(input: &str) -> i64 {
                 last_sum += atoi(v);
                 newline = true;
             }
-        } else if newline{
+        } else if newline {
             start = index;
             newline = false;
         }
@@ -116,7 +121,6 @@ pub fn part2(input: &str) -> i64 {
     }
     (first + second + third) as _
 }
-
 
 // pub fn part2(input: &str) -> i64 {
 //     let mut first = 0;

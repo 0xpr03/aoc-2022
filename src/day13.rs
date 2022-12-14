@@ -12,53 +12,53 @@ pub fn input_generator(input: &[u8]) -> Vec<u8> {
 #[derive(Clone, Debug, PartialEq, Eq)]
 enum Entity {
     Value(u16),
-    List(Vec<Entity>)
+    List(Vec<Entity>),
 }
 
 impl Ord for Entity {
     #[inline(always)]
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        match (self,other) {
+        match (self, other) {
             (Entity::Value(a), Entity::Value(b)) => a.cmp(b),
             (Entity::Value(a), Entity::List(_)) => Entity::List(vec![Entity::Value(*a)]).cmp(other),
             (Entity::List(_), Entity::Value(b)) => self.cmp(&Entity::List(vec![Entity::Value(*b)])),
             (Entity::List(la), Entity::List(lb)) => {
-                for (a,b) in la.iter().zip(lb) {
+                for (a, b) in la.iter().zip(lb) {
                     let v = a.cmp(b);
                     if v.is_ne() {
                         return v;
                     }
                 }
                 la.len().cmp(&lb.len())
-            },
+            }
         }
     }
 }
 
 impl PartialOrd for Entity {
-	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-		Some(self.cmp(other))
-	}
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 const AMOUNT: usize = 100;
 #[aoc(day13, part1, Schokis)]
-pub fn part1(input: &[u8]) -> Stack<usize,AMOUNT> {
+pub fn part1(input: &[u8]) -> Stack<usize, AMOUNT> {
     const _start: [u8; 0] = [0; 0];
     let mut left = &_start[..];
-    
-    let mut ordered: Stack<usize,AMOUNT> = Stack {
-        data: [0;AMOUNT],
+
+    let mut ordered: Stack<usize, AMOUNT> = Stack {
+        data: [0; AMOUNT],
         len: 0,
     };
 
     let mut amount = 0;
-    for (i,v) in input.split(|x|*x == b'\n').enumerate() {
+    for (i, v) in input.split(|x| *x == b'\n').enumerate() {
         match i % 3 {
             0 => left = v,
             1 => {
                 let mut right = v;
-                
+
                 // println!("l:{}",std::str::from_utf8(left).unwrap());
                 let parse_l = parse(&mut left).unwrap();
                 // println!("{:?}",parse_l);
@@ -69,8 +69,7 @@ pub fn part1(input: &[u8]) -> Stack<usize,AMOUNT> {
                 if parse_l.cmp(&parse_r).is_le() {
                     ordered.push(i / 3);
                 }
-                
-            },
+            }
             _ => (),
         }
     }
@@ -81,11 +80,11 @@ pub fn part1(input: &[u8]) -> Stack<usize,AMOUNT> {
 pub fn part2(input: &[u8]) -> usize {
     const _start: [u8; 0] = [0; 0];
     let mut left = &_start[..];
-    
-    let mut entries = arrayvec::ArrayVec::<_,302>::new();
+
+    let mut entries = arrayvec::ArrayVec::<_, 302>::new();
 
     let mut amount = 0;
-    for (i,v) in input.split(|x|*x == b'\n').enumerate() {
+    for (i, v) in input.split(|x| *x == b'\n').enumerate() {
         let mut v = v;
         match i % 3 {
             0 => entries.push(parse(&mut v).unwrap()),
@@ -101,28 +100,27 @@ pub fn part2(input: &[u8]) -> usize {
     // for (i,v) in entries.iter().enumerate() {
     //     println!("{i} {:?}",v);
     // }
-    let pos_a = entries.iter().position(|v| *v == a ).unwrap_or(0);
-    let pos_b = entries.iter().position(|v| *v == b ).unwrap_or(0);
-    (pos_a+1) * (pos_b+1)
+    let pos_a = entries.iter().position(|v| *v == a).unwrap_or(0);
+    let pos_b = entries.iter().position(|v| *v == b).unwrap_or(0);
+    (pos_a + 1) * (pos_b + 1)
 }
 
 #[inline(always)]
 fn parse(line: &mut &[u8]) -> Option<Entity> {
-    match (line.get(0),line.get(1)) {
-        (Some(a@b'0'..=b'9'), Some(b@b'0'..=b'9')) => {
+    match (line.get(0), line.get(1)) {
+        (Some(a @ b'0'..=b'9'), Some(b @ b'0'..=b'9')) => {
             *line = &line[2..];
-            Some(Entity::Value((*a as u16) * 10
-                        + (*b as u16) - 528))
+            Some(Entity::Value((*a as u16) * 10 + (*b as u16) - 528))
         }
-        (Some(a@b'0'..=b'9'),_) => {
+        (Some(a @ b'0'..=b'9'), _) => {
             *line = &line[1..];
             Some(Entity::Value((*a - b'0') as u16))
-        },
-        (Some(b'['),Some(b']')) => {
+        }
+        (Some(b'['), Some(b']')) => {
             *line = &line[2..];
             return Some(Entity::List(Vec::with_capacity(0)));
         }
-        (Some(b'['),_) => {
+        (Some(b'['), _) => {
             let mut list = Vec::new();
             *line = &line[1..];
             while let Some(v) = parse(line) {
@@ -135,7 +133,7 @@ fn parse(line: &mut &[u8]) -> Option<Entity> {
                 }
             }
             unreachable!()
-        },
+        }
         _ => {
             *line = &line[1..];
             None
@@ -143,21 +141,20 @@ fn parse(line: &mut &[u8]) -> Option<Entity> {
     }
 }
 
-
 #[derive(Copy, Clone)]
 pub struct Stack<T: Sized + Copy, const COUNT: usize> {
     len: usize,
-    data: [T; COUNT]
+    data: [T; COUNT],
 }
 
-impl<const COUNT: usize> std::fmt::Display for Stack<usize,COUNT> {
+impl<const COUNT: usize> std::fmt::Display for Stack<usize, COUNT> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let sum: usize = self.data[0..self.len].iter().map(|v|v+1).sum();
+        let sum: usize = self.data[0..self.len].iter().map(|v| v + 1).sum();
         write!(f, "{}", sum)
     }
 }
 
-impl<T: Sized + Copy + std::fmt::Debug, const COUNT: usize> std::fmt::Debug for Stack<T,COUNT> {
+impl<T: Sized + Copy + std::fmt::Debug, const COUNT: usize> std::fmt::Debug for Stack<T, COUNT> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         for i in 0..self.len {
             write!(f, "{:?},", self.data[i])?;
@@ -166,17 +163,19 @@ impl<T: Sized + Copy + std::fmt::Debug, const COUNT: usize> std::fmt::Debug for 
     }
 }
 
-impl<T: Sized + Copy + Default, const COUNT: usize> Stack<T,COUNT> {
+impl<T: Sized + Copy + Default, const COUNT: usize> Stack<T, COUNT> {
     #[inline(always)]
     fn push(&mut self, data: T) {
         //assert!(self.len < COUNT, "pushed Stack out of boundary");
-        unsafe {*self.data.get_unchecked_mut(self.len) = data;}
+        unsafe {
+            *self.data.get_unchecked_mut(self.len) = data;
+        }
         self.len += 1;
     }
     #[inline(always)]
     fn pop(&mut self) -> T {
         //assert!(self.len > 0, "stack pop underflow");
         self.len -= 1;
-        unsafe {*self.data.get_unchecked(self.len)}
+        unsafe { *self.data.get_unchecked(self.len) }
     }
 }

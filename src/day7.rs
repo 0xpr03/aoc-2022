@@ -5,14 +5,14 @@ pub fn part1(input: &[u8]) -> usize {
     let mut sizes = Stack::new();
     let mut sum = 0;
     const LIMIT: usize = 100000;
-    for line in input.split(|x|*x == b'\n') {
+    for line in input.split(|x| *x == b'\n') {
         if line.len() == 0 {
             break;
         }
         // print!("{} ",std::str::from_utf8(line).unwrap());
-        match (line[0],line[2]) {
+        match (line[0], line[2]) {
             // $ cd /
-            (b'$',b'c') => {
+            (b'$', b'c') => {
                 if line[5] == b'.' {
                     // dbg!(&sizes);
                     let v = sizes.sum_up();
@@ -26,19 +26,19 @@ pub fn part1(input: &[u8]) -> usize {
                     sizes.push(0);
                     // dbg!(&sizes);
                 }
-            },
+            }
             // $ ls
-            (b'$',b'l') => {
+            (b'$', b'l') => {
                 // println!();
                 continue;
-            },
+            }
             // dir
-            (b'd',_) => {
+            (b'd', _) => {
                 // println!();
                 continue;
-            },
+            }
             // 282147 mjtq.ffd
-            (_,_) => {
+            (_, _) => {
                 let pos = if line[6] == b' ' {
                     6
                 } else if line[5] == b' ' {
@@ -48,7 +48,7 @@ pub fn part1(input: &[u8]) -> usize {
                 } else {
                     3
                 };
-                let n = atoi(&unsafe {line.get_unchecked(..pos)});
+                let n = atoi(&unsafe { line.get_unchecked(..pos) });
                 // println!("n: {n}");
                 sizes.add(n as _);
             }
@@ -71,14 +71,14 @@ pub fn part2(input: &[u8]) -> usize {
     const REQUIRED: usize = 30000000;
     let mut sizes = Stack::new();
     let mut dirs = Dirs::new();
-    for line in input.split(|x|*x == b'\n') {
+    for line in input.split(|x| *x == b'\n') {
         if line.len() == 0 {
             break;
         }
         // print!("{} ",std::str::from_utf8(line).unwrap());
-        match (line[0],line[2]) {
+        match (line[0], line[2]) {
             // $ cd /
-            (b'$',b'c') => {
+            (b'$', b'c') => {
                 if line[5] == b'.' {
                     // dbg!(&sizes);
                     let v = sizes.sum_up();
@@ -88,20 +88,19 @@ pub fn part2(input: &[u8]) -> usize {
                     sizes.push(0);
                     // dbg!(&sizes);
                 }
-            },
+            }
             // $ ls
-            (b'$',b'l') => {
+            (b'$', b'l') => {
                 // println!();
                 continue;
-            },
+            }
             // dir
-            (b'd',_) => {
+            (b'd', _) => {
                 // println!();
                 continue;
-            },
+            }
             // 282147 mjtq.ffd
-            (_,_) => {
-                
+            (_, _) => {
                 // let pos = line.iter().position(|v|*v == b' ').unwrap_or(0);
                 let pos = if line[6] == b' ' {
                     6
@@ -112,7 +111,7 @@ pub fn part2(input: &[u8]) -> usize {
                 } else {
                     3
                 };
-                let n = atoi(&unsafe {line.get_unchecked(..pos)});
+                let n = atoi(&unsafe { line.get_unchecked(..pos) });
                 // let mut foo = line.split(|x|*x == b' ');
                 // let number = foo.next().unwrap();
                 // let n = atoi(number);
@@ -125,10 +124,10 @@ pub fn part2(input: &[u8]) -> usize {
         let v = sizes.sum_up();
         dirs.push(v);
     }
-    let sum = unsafe {sizes.data.get_unchecked(0)};
+    let sum = unsafe { sizes.data.get_unchecked(0) };
     let needed = REQUIRED - (TOTAL - sum);
     let mut dir = REQUIRED;
-    for d in unsafe {dirs.data.get_unchecked_mut(0..dirs.len)}.iter() {
+    for d in unsafe { dirs.data.get_unchecked_mut(0..dirs.len) }.iter() {
         if *d > needed && *d < dir {
             dir = *d;
         }
@@ -156,28 +155,31 @@ fn atoi(bytes: &[u8]) -> u32 {
         //     (bytes[5] as u32) * 10 +
         //     (bytes[6] as u32) -
         //     53333328,
-        6 => (bytes[0] as u32) * 100000 +
-            (bytes[1] as u32) * 10000 +
-            (bytes[2] as u32) * 1000 +
-            (bytes[3] as u32) * 100 +
-            (bytes[4] as u32) * 10 +
-            (bytes[5] as u32) -
-            5333328,
-        5 => (bytes[0] as u32) * 10000 +
-            (bytes[1] as u32) * 1000 +
-            (bytes[2] as u32) * 100 +
-            (bytes[3] as u32) * 10 +
-            (bytes[4] as u32) -
-            533328,
-        4 => (bytes[0] as u32) * 1000 +
-            (bytes[1] as u32) * 100 +
-            (bytes[2] as u32) * 10 +
-            (bytes[3] as u32) -
-            53328,
-        3 => (bytes[0] as u32) * 100 +
-            (bytes[1] as u32) * 10 +
-            (bytes[2] as u32) -
-            5328,
+        6 => {
+            (bytes[0] as u32) * 100000
+                + (bytes[1] as u32) * 10000
+                + (bytes[2] as u32) * 1000
+                + (bytes[3] as u32) * 100
+                + (bytes[4] as u32) * 10
+                + (bytes[5] as u32)
+                - 5333328
+        }
+        5 => {
+            (bytes[0] as u32) * 10000
+                + (bytes[1] as u32) * 1000
+                + (bytes[2] as u32) * 100
+                + (bytes[3] as u32) * 10
+                + (bytes[4] as u32)
+                - 533328
+        }
+        4 => {
+            (bytes[0] as u32) * 1000
+                + (bytes[1] as u32) * 100
+                + (bytes[2] as u32) * 10
+                + (bytes[3] as u32)
+                - 53328
+        }
+        3 => (bytes[0] as u32) * 100 + (bytes[1] as u32) * 10 + (bytes[2] as u32) - 5328,
         _ => 0,
     }
 }
@@ -204,47 +206,53 @@ fn atoi(bytes: &[u8]) -> u32 {
 
 struct Dirs {
     len: usize,
-    data: [usize; DIRS]
+    data: [usize; DIRS],
 }
 
 impl Dirs {
     const fn new() -> Self {
         Self {
             len: 0,
-            data: [0; DIRS]
+            data: [0; DIRS],
         }
     }
     #[inline(always)]
     fn push(&mut self, data: usize) {
         // assert!(self.len < ENTRIES, "pushed Stack out of boundary");
-        unsafe {*self.data.get_unchecked_mut(self.len) = data;}
+        unsafe {
+            *self.data.get_unchecked_mut(self.len) = data;
+        }
         self.len += 1;
     }
 }
 
 #[derive(Debug)]
-struct Stack{
+struct Stack {
     len: usize,
-    data: [usize;ENTRIES]
+    data: [usize; ENTRIES],
 }
 
 impl Stack {
     const fn new() -> Self {
         Self {
             len: 0,
-            data: [0; ENTRIES]
+            data: [0; ENTRIES],
         }
     }
     #[inline(always)]
     fn push(&mut self, data: usize) {
         // assert!(self.len < ENTRIES, "pushed Stack out of boundary");
-        unsafe{*self.data.get_unchecked_mut(self.len) = data;}
+        unsafe {
+            *self.data.get_unchecked_mut(self.len) = data;
+        }
         self.len += 1;
     }
     #[inline(always)]
     pub fn add(&mut self, data: usize) {
         // assert!(self.len > 0, "add out of bounds");
-        unsafe {*self.data.get_unchecked_mut(self.len-1) += data;}
+        unsafe {
+            *self.data.get_unchecked_mut(self.len - 1) += data;
+        }
     }
     #[inline(always)]
     fn sum_up(&mut self) -> usize {
@@ -252,7 +260,7 @@ impl Stack {
         self.len -= 1;
         unsafe {
             let v = *self.data.get_unchecked(self.len);
-            *self.data.get_unchecked_mut(self.len-1) += v;
+            *self.data.get_unchecked_mut(self.len - 1) += v;
             return v;
         }
     }
@@ -263,8 +271,8 @@ mod test {
     use super::*;
     #[test]
     fn audio_test() {
-        assert_eq!(atoi("242795".as_bytes()),242795);
-        assert_eq!(atoi("24279".as_bytes()),24279);
-        assert_eq!(atoi("2427".as_bytes()),2427);
+        assert_eq!(atoi("242795".as_bytes()), 242795);
+        assert_eq!(atoi("24279".as_bytes()), 24279);
+        assert_eq!(atoi("2427".as_bytes()), 2427);
     }
 }
