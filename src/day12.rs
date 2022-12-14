@@ -82,6 +82,8 @@ pub fn part1(input: &[u8]) -> usize {
                     visited[yn * COL_LENGTH + xn] = Some((x,y));
                     //queue.push((xn,yn)); // for path
                     end = (xn,yn);
+                    queue.clear();
+                    break;
                 },
                 _ => {
                     // println!("Skip ({x},{y}):{}->({xn},{yn}):{} diff {diff}",height as char,height_n as char);
@@ -136,11 +138,7 @@ pub fn part2(input: &[u8]) -> usize {
     };
 
     let mut end = (0,0);
-
-    // we need to specifically find the tiniest amount of moves
-    // in contrast to p1 we can't just leave it to BFS
-    let mut min_moves = usize::MAX;
-    
+   
     while let Some((x,y)) = queue.pop_front() {
         neighbours.len = 0;
         let height = input[y * COL_LENGTH_INP + x];
@@ -177,18 +175,8 @@ pub fn part2(input: &[u8]) -> usize {
                     visited[yn * COL_LENGTH + xn] = Some((x,y));
                     //queue.push((xn,yn)); // for path
                     end = (xn,yn);
-                    let mut moves = 0;
-                    let mut node = Some((xn,yn));
-                    while let Some((x,y)) = node {
-                        node = visited[y * COL_LENGTH + x];
-                        moves += 1;
-                        if node == Some(start) {
-                            break;
-                        }
-                    }
-                    if moves < min_moves {
-                        min_moves = moves;
-                    }
+                    queue.clear();
+                    break;
                 },
                 (true,_,_,_) | (_,0..=1,_,_) | (_,_,b'E',b'y'..=b'z') => {
                     visited[yn * COL_LENGTH + xn] = Some((x,y));
@@ -203,7 +191,17 @@ pub fn part2(input: &[u8]) -> usize {
         }
     }
     // print_visited(&visited, COL_LENGTH, ROWS, start,end);
-    min_moves
+    let mut moves = 0;
+    let mut node = Some(end);
+    while let Some((x,y)) = node {
+        // println!("{x},{y}");
+        node = visited[y * COL_LENGTH + x];
+        moves += 1;
+        if node == Some(start) {
+            break;
+        }
+    }
+    moves
 }
 
 #[derive(Copy, Clone, Debug)]
