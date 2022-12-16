@@ -95,10 +95,6 @@ pub fn part2(input: &[u8]) -> isize {
         y: isize,
         dist: usize,
     }
-    // const ASKED_Y: isize = 10;
-    // let mut rows: Vec<Vec<Range>> = Vec::with_capacity(MAX_XY.abs_diff(MIN_XY) as usize);
-    // let mut ranges: Vec<Range> = Vec::with_capacity(25);
-    // let mut skipped = 0;
     let sensors: Vec<Sensor> = input.split(|x|*x == b'\n').filter(|v|!v.is_empty()).map(|v| {
         let iter = v.split(|x|*x == b',' || *x == b':');
         // iter_next_chunk is marked as slow https://github.com/rust-lang/rust/issues/98326#issuecomment-1166338225
@@ -117,8 +113,7 @@ pub fn part2(input: &[u8]) -> isize {
             dist: distance
         }
     }).collect();
-    // (MIN_XY..MAX_XY).into_par_iter().map(|i|{
-        for i in MIN_XY..MAX_XY {
+    (MIN_XY..MAX_XY).into_par_iter().find_map_any(|i|{
         let mut row = Vec::with_capacity(ROW_CAP);
         for v in &sensors {
             
@@ -187,25 +182,18 @@ pub fn part2(input: &[u8]) -> isize {
         for p in &new_ranges2 {
             if x < p.0 {
                 // println!("S1: {x},{i}: {}",x * MULT + i);
-                return x * MULT + i;
+                return Some(x * MULT + i);
             } else if x < p.1 {
                 x = p.1 + 1 ;
             }
         }
         if x < MAX_XY {
-            // println!("S2: {x},{i}: {}",x * MULT + i);
-            return x * MULT + i;
+            return Some(x * MULT + i);
         }
         // println!("{}",new_ranges2.len());
-        // new_ranges2
-    // }).collect_into_vec(&mut rows);
-        }
-    // rows[2000000].iter().map(|x|x.count()).sum()
-    0
+        None
+    }).unwrap_or(0)
 }
-
-
-
 
 #[derive(Debug,PartialEq, Eq, Copy, Clone)]
 struct Range(isize,isize);
