@@ -82,6 +82,130 @@ pub fn part1(input: &[u8]) -> isize {
     new_ranges2.iter().map(|x|x.count()).sum()
 }
 
+#[aoc(day15, part2, Schokis)]
+pub fn part2(input: &[u8]) -> isize {
+    use rayon::prelude::*;
+    const MIN_XY: isize = 0;
+    const MAX_XY: isize = 4000000;
+    const MULT : isize = 4000000;
+    const ROW_CAP: usize = 25;
+    #[derive(Debug)]
+    struct Sensor {
+        x: isize,
+        y: isize,
+        dist: usize,
+    }
+    // const ASKED_Y: isize = 10;
+    // let mut rows: Vec<Vec<Range>> = Vec::with_capacity(MAX_XY.abs_diff(MIN_XY) as usize);
+    // let mut ranges: Vec<Range> = Vec::with_capacity(25);
+    // let mut skipped = 0;
+    let sensors: Vec<Sensor> = input.split(|x|*x == b'\n').filter(|v|!v.is_empty()).map(|v| {
+        let iter = v.split(|x|*x == b',' || *x == b':');
+        // iter_next_chunk is marked as slow https://github.com/rust-lang/rust/issues/98326#issuecomment-1166338225
+        // so we'll use this
+        let data = iter.array_chunks::<4>().next().unwrap();
+
+        let s_x = atoi(&data[0][12..]);
+        let s_y = atoi(&data[1][3..]);
+        let b_x = atoi(&data[2][24..]);
+        let b_y = atoi(&data[3][3..]);
+
+        let distance = s_x.abs_diff(b_x) + s_y.abs_diff(b_y);
+        Sensor {
+            x: s_x,
+            y: s_y,
+            dist: distance
+        }
+    }).collect();
+    // (MIN_XY..MAX_XY).into_par_iter().map(|i|{
+        for i in MIN_XY..MAX_XY {
+        let mut row = Vec::with_capacity(ROW_CAP);
+        for v in &sensors {
+            
+            let distance_isize = v.dist as isize;
+            if v.y > i && v.y - distance_isize > i {
+                // println!("SkipA {i}");
+                continue;
+            }
+            if v.y < i && v.y + distance_isize < i {
+                // println!("SkipB {i}");
+                continue;
+            }
+            // if v.x > MAX_XY && v.x - distance_isize > MAX_XY {
+            //     println!("SkipC {i}");
+            //     continue;
+            // }
+            // if v.x < MIN_XY && v.x + distance_isize < MIN_XY {
+            //     println!("SkipD {i}");
+            //     continue;
+            // }
+            let rem = (v.dist - v.y.abs_diff(i)) as isize;
+            let mut range = Some(Range(v.x - (rem),v.x+(rem)));
+            for rm in row.iter_mut() {
+                if let Some(r) = range {
+                    range = r.adjust(rm);
+                } else {
+                    break;
+                }
+            }
+            if let Some(r) = range {
+                row.push(r);
+            }
+        }
+        let mut new_ranges = Vec::with_capacity(row.len());
+        for p in row.into_iter() {
+            let mut range = Some(p);
+            
+            for rm in new_ranges.iter_mut() {
+                if let Some(r) = range {
+                    range = r.adjust(rm);
+                } else {
+                    break;
+                }
+            }
+            if let Some(r) = range {
+                new_ranges.push(r);
+            }
+        }
+        let mut new_ranges2 = Vec::with_capacity(new_ranges.len());
+        for p in new_ranges.into_iter() {
+            let mut range = Some(p);
+            
+            for rm in new_ranges2.iter_mut() {
+                if let Some(r) = range {
+                    range = r.adjust(rm);
+                } else {
+                    break;
+                }
+            }
+            if let Some(r) = range {
+                new_ranges2.push(r);
+            }
+        }
+        new_ranges2.sort_unstable();
+        let mut x = MIN_XY;
+        for p in &new_ranges2 {
+            if x < p.0 {
+                // println!("S1: {x},{i}: {}",x * MULT + i);
+                return x * MULT + i;
+            } else if x < p.1 {
+                x = p.1 + 1 ;
+            }
+        }
+        if x < MAX_XY {
+            // println!("S2: {x},{i}: {}",x * MULT + i);
+            return x * MULT + i;
+        }
+        // println!("{}",new_ranges2.len());
+        // new_ranges2
+    // }).collect_into_vec(&mut rows);
+        }
+    // rows[2000000].iter().map(|x|x.count()).sum()
+    0
+}
+
+
+
 
 #[derive(Debug,PartialEq, Eq, Copy, Clone)]
 struct Range(isize,isize);
@@ -109,6 +233,21 @@ impl Range {
     #[inline(always)]
     fn count(&self) -> isize {
         self.1 - self.0
+    }
+}
+
+impl Ord for Range {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        match self.0.cmp(&other.0) {
+            std::cmp::Ordering::Equal => self.1.cmp(&other.1),
+            v => v,
+        }
+    }
+}
+
+impl PartialOrd for Range {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(&other))
     }
 }
 
